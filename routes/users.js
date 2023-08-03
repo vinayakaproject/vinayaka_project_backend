@@ -76,7 +76,28 @@ router.post("/postOrder", async (req, res) => {
 router.post("/getOrderbyUser", async (req, res) => {
 	try {
 		console.log(req.body.userid)
-		const orders = await Order.find({ userId: req.body.userid }).populate("productId");
+		const orders = await Order.find({ userId: req.body.userid }).populate("productId", {name: 1, image: 1, price: 1, _id: 0}).populate("userId", {name: 1, email: 1, _id: 0}).sort({ date: -1, _id: -1 }).limit(20);
+		res.status(201).send({ message: orders });
+	} catch (error) {
+		console.log(error)
+		res.status(500).send({ message: "Internal Server Error" });
+	}
+});
+
+router.get("/getTotalOrders", async (req, res) => {
+	try {
+		const orders = await Order.find().countDocuments();
+		console.log(orders);
+		res.status(201).send({ message: orders });
+	} catch (error) {
+		console.log(error)
+		res.status(500).send({ message: "Internal Server Error" });
+	}
+});
+
+router.post("/getOrderbyFilter", async (req, res) => {
+	try {
+		const orders = await Order.find(req.body.query).populate("productId", {name: 1, image: 1, price: 1, _id: 0}).populate("userId", {name: 1, email: 1, _id: 0}).sort({ date: -1, _id: -1 }).skip(req.body.skip).limit(20);
 		res.status(201).send({ message: orders });
 	} catch (error) {
 		console.log(error)
@@ -86,7 +107,30 @@ router.post("/getOrderbyUser", async (req, res) => {
 
 router.post("/getAllProducts", async (req, res) => {
 	try {
-		const products = await Product.find();
+		console.log(req.body.skip);
+		const products = await Product.find({}).sort({ date: -1, _id: -1 }).skip(req.body.skip).limit(20);
+		console.log(products);
+		res.status(201).send({ message: products });
+	} catch (error) {
+		console.log(error)
+		res.status(500).send({ message: "Internal Server Error" });
+	}
+});
+
+router.get("/getTotalProducts", async (req, res) => {
+	try {
+		const products = await Product.find().countDocuments();
+		console.log(products);
+		res.status(201).send({ message: products });
+	} catch (error) {
+		console.log(error)
+		res.status(500).send({ message: "Internal Server Error" });
+	}
+});
+
+router.get("/getLatestFiveProd", async (req, res) => {
+	try {
+		const products = await Product.find({}).sort({ date: -1, _id: -1 }).limit(8);
 		res.status(201).send({ message: products });
 	} catch (error) {
 		console.log(error)
