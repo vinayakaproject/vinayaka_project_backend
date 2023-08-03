@@ -13,6 +13,7 @@ const orderSchema = new mongoose.Schema({
 	orderId: { type: String, required: true },
 	status: { type: String, required: true },
     userId: { type: String, required: true, ref: User },
+	date: { type: Date, default: Date.now },
 });
 
 const Order = mongoose.model("order", orderSchema);

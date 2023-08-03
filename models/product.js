@@ -6,6 +6,7 @@ const productSchema = new mongoose.Schema({
 	net_weight: { type: String },
 	price: { type: String, required: true },
 	image: { type: String, required: true },
+	date: { type: Date, default: Date.now },
 });
 
 const Product = mongoose.model("product", productSchema);
