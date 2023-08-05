@@ -50,7 +50,7 @@ router.post("/addManyProducts", async (req, res) => {
 router.post("/getAllProducts", async (req, res) => {
 	try {
 		console.log(req.body.skip);
-		const products = await Product.find({}).sort({ date: -1, _id: -1 }).skip(req.body.skip).limit(20);
+		const products = await Product.find(req.body.query).sort({ date: -1, _id: -1 }).skip(req.body.skip).limit(20);
 		console.log(products);
 		res.status(201).send({ message: products });
 	} catch (error) {
@@ -112,9 +112,9 @@ router.post("/deleteProduct", async (req, res) => {
 	}
 });
 
-router.get("/getAllOrders", async (req, res) => {
+router.post("/getAllOrders", async (req, res) => {
 	try {
-		const orders = await Order.find({ "status": { "$ne": 'Cancelled' } }).populate("productId", {name: 1, image: 1, price: 1, _id: 0}).populate("userId", {name: 1, email: 1, _id: 0}).sort({ date: -1, _id: -1 }).limit(20);
+		const orders = await Order.find({ ...req.body.query, "status": { "$ne": 'Cancelled' } }).populate("productId", {name: 1, image: 1, price: 1, _id: 0}).populate("userId", {name: 1, email: 1, _id: 0}).sort({ date: -1, _id: -1 }).limit(20);
 		res.status(201).send({ message: orders });
 	} catch (error) {
 		console.log(error)
@@ -147,6 +147,17 @@ router.post("/getOrder", async (req, res) => {
 	try {
 		const orders = await Order.find({ _id: req.body.orderId }).populate("productId", {name: 1, image: 1, price: 1, _id: 0}).populate("userId", {name: 1, email: 1, _id: 0});
 		res.status(201).send({ message: orders });
+	} catch (error) {
+		console.log(error)
+		res.status(500).send({ message: "Internal Server Error" });
+	}
+});
+
+router.get("/testOrder", async (req, res) => {
+	try {
+		const orders = await Order.find({ paymentMode: "Cash on Delivery" }, { status: "Cancelled" }).limit(2);
+		const orders2 = await Order.find({ paymentMode: "Cash on Delivery" , status: { $eq: 'Cancelled'} }).limit(2);
+		res.status(201).send({ message: [orders, orders2] });
 	} catch (error) {
 		console.log(error)
 		res.status(500).send({ message: "Internal Server Error" });
