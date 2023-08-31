@@ -1,9 +1,20 @@
 const router = require("express").Router();
 const { Product } = require("../models/product");
 const { Order } = require("../models/order");
+const { User } = require("../models/user");
 
 router.get("/", (req, res) => {
 	res.send("Admin Server");
+});
+
+router.get("/getAllUsers", async (req, res) => {
+	try {
+		const users = await User.find({});
+		res.status(201).send({ message: users });
+	} catch (error) {
+		console.log(error)
+		res.status(500).send({ message: "Internal Server Error" });
+	}
 });
 
 router.post("/addProducts", async (req, res) => {
@@ -116,6 +127,26 @@ router.post("/getAllOrders", async (req, res) => {
 	try {
 		const orders = await Order.find({ ...req.body.query, "status": { "$ne": 'Cancelled' } }).populate("productId", {name: 1, image: 1, price: 1, _id: 0}).populate("userId", {name: 1, email: 1, _id: 0}).sort({ date: -1, _id: -1 }).limit(20);
 		res.status(201).send({ message: orders });
+	} catch (error) {
+		console.log(error)
+		res.status(500).send({ message: "Internal Server Error" });
+	}
+});
+
+router.get("/deleteAllOrders", async (req, res) => {
+	try {
+		await Order.deleteMany({});
+		res.status(201).send({ message: "Deleted" });
+	} catch (error) {
+		console.log(error)
+		res.status(500).send({ message: "Internal Server Error" });
+	}
+});
+
+router.get("/deleteAllProducts", async (req, res) => {
+	try {
+		await Product.deleteMany({});
+		res.status(201).send({ message: "Deleted" });
 	} catch (error) {
 		console.log(error)
 		res.status(500).send({ message: "Internal Server Error" });
