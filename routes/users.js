@@ -117,6 +117,17 @@ router.post("/getAllProducts", async (req, res) => {
 	}
 });
 
+router.post("/getProduct", async (req, res) => {
+	try {
+		const product = await Product.find({ _id: req.body.id });
+		console.log(product);
+		res.status(201).send({ message: product });
+	} catch (error) {
+		console.log(error)
+		res.status(500).send({ message: "Internal Server Error" });
+	}
+});
+
 router.get("/getTotalProducts", async (req, res) => {
 	try {
 		const products = await Product.find().countDocuments();
