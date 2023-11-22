@@ -108,7 +108,7 @@ router.post("/getOrderbyFilter", async (req, res) => {
 router.post("/getAllProducts", async (req, res) => {
 	try {
 		console.log(req.body.skip);
-		const products = await Product.find({}).sort({ date: -1, _id: -1 }).skip(req.body.skip).limit(20);
+		const products = await Product.find(req.body.query).sort({ date: -1, _id: -1 }).skip(req.body.skip).limit(20);
 		console.log(products);
 		res.status(201).send({ message: products });
 	} catch (error) {
